@@ -110,11 +110,16 @@
 </div>
 
 <style>
-	.flashcard-container {
-		perspective: 1000px;
+		.flashcard-container {
 		width: 100%;
-		max-width: 500px;
-		height: 550px;
+		max-width: 700px;
+		height: 450px;
+		perspective: 1000px;
+		position: relative;
+		cursor: pointer;
+		border-radius: 1.5rem;
+		transition: transform 0.6s;
+		transform-style: preserve-3d;
 	}
 
 	.flashcard {
@@ -313,7 +318,7 @@
 
 	@media (max-width: 768px) {
 		.flashcard-container {
-			height: 450px;
+			height: 380px;
 		}
 
 		.card-face {
