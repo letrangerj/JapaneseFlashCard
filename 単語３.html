@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第三课 形容词 Flashcards</title>
+    <!-- 1. FONT FIX: Import Google Fonts for Japanese and Simplified Chinese -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --primary-text: #2c3e50;
+            --secondary-text: #7f8c8d;
+            --accent-color: #3498db;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-color: #e0e0e0;
+            --btn-bg: #ffffff;
+            --btn-border: #e0e0e0;
+            --btn-hover-bg: #f0f0f0;
+        }
+
+        /* 2. NIGHT MODE: Define colors for night mode */
+        .night-mode {
+            --bg-color: #1c1c22;
+            --card-bg: #2a2a34;
+            --primary-text: #e1e1e1;
+            --secondary-text: #8d8d9b;
+            --accent-color: #4aa9f0;
+            --shadow-color: rgba(0, 0, 0, 0.2);
+            --border-color: #40404c;
+            --btn-bg: #3c3c4a;
+            --btn-border: #50505c;
+            --btn-hover-bg: #50505c;
+        }
+        
+        body {
+            /* FONT FIX: Apply the new fonts */
+            font-family: 'Noto Sans JP', 'Noto Sans SC', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            color: var(--secondary-text);
+            font-size: 1.1em;
+            padding: 0 10px;
+        }
+        
+        .header h3 {
+             margin: 0;
+        }
+
+        .progress-bar {
+            font-weight: bold;
+        }
+
+        #theme-toggle-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--secondary-text);
+        }
+
+        .card-container {
+            perspective: 1000px;
+            height: 550px;
+        }
+        
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s, background-color 0.3s;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+        .card-face::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .front-word-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #front-word {
+            font-size: 4em;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .card-face-back {
+            transform: rotateY(180deg);
+            justify-content: flex-start;
+            text-align: left;
+            align-items: stretch;
+        }
+
+        #show-answer-btn {
+            padding: 12px 25px;
+            font-size: 1.2em;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        
+        #show-answer-btn:hover {
+            opacity: 0.9;
+        }
+
+        #back-header {
+            font-size: 2.5em;
+            font-weight: 500;
+            margin: 0 0 15px 0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        #back-header .reading {
+            font-size: 0.5em;
+            color: var(--secondary-text);
+            margin-left: 10px;
+        }
+        
+        .audio-icon {
+            cursor: pointer;
+            color: var(--accent-color);
+            transition: color 0.2s;
+            user-select: none;
+        }
+        .audio-icon:hover {
+            opacity: 0.8;
+        }
+
+        #front-audio-icon {
+            font-size: 2rem;
+            margin-left: 20px;
+        }
+
+        #back-header .audio-icon, .example-audio-icon {
+            font-size: 0.8em;
+            margin-left: 15px;
+        }
+
+        #meanings {
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            line-height: 1.7;
+        }
+        
+        #meanings div {
+            margin-bottom: 5px;
+        }
+
+        #examples-container h4 {
+            margin: 0 0 10px 0;
+            color: var(--secondary-text);
+            font-weight: 500;
+        }
+        
+        #examples-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 1.1em;
+        }
+        
+        #examples-list li {
+            margin-bottom: 15px;
+        }
+
+        .jp-sentence {
+            line-height: 1.8;
+            display: flex;
+            align-items: center;
+        }
+        
+        .cn-translation {
+            color: var(--secondary-text);
+            font-size: 0.9em;
+            padding-left: 5px;
+        }
+        
+        ruby rt {
+            font-size: 0.6em;
+            color: var(--secondary-text);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        
+        .nav-btn, #restart-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: 1px solid var(--btn-border);
+            background-color: var(--btn-bg);
+            color: var(--primary-text);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 120px;
+            font-family: inherit;
+        }
+        
+        .nav-btn:hover, #restart-btn:hover {
+            background-color: var(--btn-hover-bg);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="header">
+            <h3 id="progress-bar"></h3>
+            <h3>第三课 形容词</h3>
+            <button id="theme-toggle-btn">🌙</button>
+        </div>
+
+        <div class="card-container">
+            <div class="card" id="flashcard">
+                <div class="card-face card-face-front">
+                    <div class="front-word-container">
+                        <h2 id="front-word"></h2>
+                        <span id="front-audio-icon" class="audio-icon">🔊</span>
+                    </div>
+                    <button id="show-answer-btn">Show Answer</button>
+                </div>
+                <div class="card-face card-face-back">
+                    <h1 id="back-header">
+                        <span id="back-word"></span>
+                        <span id="back-reading" class="reading"></span>
+                        <span class="audio-icon">🔊</span>
+                    </h1>
+                    <div id="meanings"></div>
+                    <div id="examples-container">
+                        <h4>Examples:</h4>
+                        <ul id="examples-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <button class="nav-btn" id="prev-btn">Previous</button>
+            <button id="restart-btn">Reshuffle</button>
+            <button class="nav-btn" id="next-btn">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const flashcardsData = [
+          { "id": 1, "word": "厚かましい", "reading": "あつかましい", "meanings": ["厚脸皮；不害羞；无耻"], "examples": [ { "jp_furigana": "<ruby>厚<rt>あつ</rt></ruby>かましいにも<ruby>程<rt>ほど</rt></ruby>がある", "jp_clean": "厚かましいにも程がある", "cn": "竟无耻到这般地步" }, { "jp_furigana": "<ruby>厚<rt>あつ</rt></ruby>かましくもまた<ruby>金<rt>かね</rt></ruby>を<ruby>借<rt>か</rt></ruby>りにきた", "jp_clean": "厚かましくもまた金を借りにきた", "cn": "居然还腆着脸又来借钱" }, { "jp_furigana": "わたしが<ruby>言<rt>い</rt></ruby>うのも<ruby>厚<rt>あつ</rt></ruby>かましいが", "jp_clean": "わたしが言うのも厚かましいが", "cn": "我这样说都感觉难为情，不过……" }, { "jp_furigana": "なんという<ruby>厚<rt>あつ</rt></ruby>かましいやつだろう", "jp_clean": "なんという厚かましいやつだろう", "cn": "是个多么厚颜无耻的家伙" } ] },
+          { "id": 2, "word": "慌しい", "reading": "あわただしい", "meanings": ["慌忙的；匆忙的", "不稳定的；动荡不安的"], "examples": [ { "jp_furigana": "<ruby>慌<rt>あわ</rt></ruby>ただしく<ruby>旅立<rt>たびだ</rt></ruby>つ", "jp_clean": "慌ただしく旅立つ", "cn": "(1) 匆忙起程" }, { "jp_furigana": "<ruby>政局<rt>せいきょく</rt></ruby>が<ruby>慌<rt>あわ</rt></ruby>ただしい", "jp_clean": "政局が慌ただしい", "cn": "(2) 政局动荡不安" } ] },
+          { "id": 3, "word": "怪しい", "reading": "あやしい", "meanings": ["（奇怪）可疑", "奇异；奇怪；特别", "靠不住；难以置信", "不好；拙劣"], "examples": [ { "jp_furigana": "<ruby>怪<rt>あや</rt></ruby>しい<ruby>風体<rt>ふうたい</rt></ruby>の<ruby>男<rt>おとこ</rt></ruby>", "jp_clean": "怪しい風体の男", "cn": "(1) 样子可疑的汉子" }, { "jp_furigana": "<ruby>挙動<rt>きょどう</rt></ruby>が<ruby>怪<rt>あや</rt></ruby>しい", "jp_clean": "挙動が怪しい", "cn": "(1) 行动可疑" }, { "jp_furigana": "あいつが<ruby>怪<rt>あや</rt></ruby>しい", "jp_clean": "あいつが怪しい", "cn": "(1) 那个家伙形迹可疑" }, { "jp_furigana": "<ruby>怪<rt>あや</rt></ruby>しい<ruby>物音<rt>ものおと</rt></ruby>", "jp_clean": "怪しい物音", "cn": "(2) 奇怪的声音" }, { "jp_furigana": "<ruby>怪<rt>あや</rt></ruby>しい<ruby>足音<rt>あしおと</rt></ruby>が<ruby>近<rt>ちか</rt></ruby>づいた", "jp_clean": "怪しい足音が近づいた", "cn": "(2) 莫名其妙的脚步声走来了" }, { "jp_furigana": "あすの<ruby>天気<rt>てんき</rt></ruby>は<ruby>怪<rt>あや</rt></ruby>しい", "jp_clean": "あすの天気は怪しい", "cn": "(3) 明天的天气靠不住" }, { "jp_furigana": "そのニュースは<ruby>根拠<rt>こんきょ</rt></ruby>が<ruby>怪<rt>あや</rt></ruby>しい", "jp_clean": "そのニュースは根拠が怪しい", "cn": "(3) 那个消息的出处不可靠" }, { "jp_furigana": "<ruby>彼<rt>かれ</rt></ruby>の<ruby>英語<rt>えいご</rt></ruby>は<ruby>怪<rt>あや</rt></ruby>しいものだ", "jp_clean": "彼の英語は怪しいものだ", "cn": "(4) 他的英语很糟" }, { "jp_furigana": "<ruby>怪<rt>あや</rt></ruby>しい<ruby>日本語<rt>にほんご</rt></ruby>で<ruby>演説<rt>えんぜつ</rt></ruby>した", "jp_clean": "怪しい日本語で演説した", "cn": "(4) 用拙劣的日语讲演" } ] },
+          { "id": 4, "word": "勇ましい", "reading": "いさましい", "meanings": ["勇敢；勇猛", "活泼；生气勃勃", "振奋人心"], "examples": [ { "jp_furigana": "<ruby>勇<rt>いさ</rt></ruby>ましい<ruby>兵士<rt>へいし</rt></ruby>", "jp_clean": "勇ましい兵士", "cn": "(1) 勇敢的战士" }, { "jp_furigana": "<ruby>近<rt>ちか</rt></ruby>ごろの<ruby>女性<rt>じょせい</rt></ruby>はなかなか<ruby>勇<rt>いさ</rt></ruby>ましい", "jp_clean": "近ごろの女性はなかなか勇ましい", "cn": "(2) 近来的妇女非常活泼" }, { "jp_furigana": "<ruby>勇<rt>いさ</rt></ruby>ましい<ruby>音<rt>おと</rt></ruby>", "jp_clean": "勇ましい音", "cn": "(3) 振奋人心的声音" } ] },
+          { "id": 5, "word": "著しい", "reading": "いちじるしい", "meanings": ["显著；显然；明显"], "examples": [ { "jp_furigana": "<ruby>進歩<rt>しんぽ</rt></ruby>のあとが<ruby>著<rt>いちじる</rt></ruby>しい", "jp_clean": "進歩のあとが著しい", "cn": "进步的迹象显著" }, { "jp_furigana": "<ruby>著<rt>いちじる</rt></ruby>しい<ruby>差異<rt>さい</rt></ruby>がある", "jp_clean": "著しい差異がある", "cn": "有很大差别" }, { "jp_furigana": "<ruby>著<rt>いちじる</rt></ruby>しく<ruby>優<rt>まさ</rt></ruby>っている", "jp_clean": "著しく優っている", "cn": "优越得多" } ] },
+          { "id": 6, "word": "疎い", "reading": "うとい", "meanings": ["疏远", "不了解；生疏"], "examples": [ { "jp_furigana": "<ruby>二人<rt>ふたり</rt></ruby>の<ruby>仲<rt>なか</rt></ruby>はだんだん<ruby>疎<rt>うと</rt></ruby>いものになってきた", "jp_clean": "二人の仲はだんだん疎いものになってきた", "cn": "(1) 两个人的关系逐渐疏远起来了" }, { "jp_furigana": "<ruby>世事<rt>せじ</rt></ruby>に<ruby>疎<rt>うと</rt></ruby>い", "jp_clean": "世事に疎い", "cn": "(2) 不谙世故" }, { "jp_furigana": "<ruby>実情<rt>じつじょう</rt></ruby>に<ruby>疎<rt>うと</rt></ruby>い", "jp_clean": "実情に疎い", "cn": "(2) 不了解真实情况" } ] },
+          { "id": 7, "word": "賢い", "reading": "かしこい", "meanings": ["聪明；贤明", "周到；不疏忽"], "examples": [ { "jp_furigana": "<ruby>賢<rt>かしこ</rt></ruby>い<ruby>仕方<rt>やりかた</rt></ruby>", "jp_clean": "賢い仕方", "cn": "(1) 高明的办法" }, { "jp_furigana": "あの<ruby>子<rt>こ</rt></ruby>はなかなか<ruby>賢<rt>かしこ</rt></ruby>い", "jp_clean": "あの子はなかなか賢い", "cn": "(1) 那个孩子真聪明" }, { "jp_furigana": "<ruby>賢<rt>かしこ</rt></ruby>く<ruby>立<rt>た</rt></ruby>ち<ruby>回<rt>まわ</rt></ruby>る", "jp_clean": "賢く立ち回る", "cn": "(2) 处理有方" } ] },
+          { "id": 8, "word": "悔しい", "reading": "くやしい", "meanings": ["令人懊悔；遗憾"], "examples": [ { "jp_furigana": "あそこで<ruby>決心<rt>けっしん</rt></ruby>しなかったことが<ruby>悔<rt>くや</rt></ruby>しい", "jp_clean": "あそこで決心しなかったことが悔しい", "cn": "在那时没有下决心真遗憾" } ] },
+          { "id": 9, "word": "険しい", "reading": "けわしい", "meanings": ["险峻；陡峭；崎岖", "险恶；艰险；严峻", "严厉；可怕；粗暴"], "examples": [ { "jp_furigana": "<ruby>険<rt>けわ</rt></ruby>しい<ruby>道<rt>みち</rt></ruby>を<ruby>登<rt>のぼ</rt></ruby>ってやっと<ruby>頂上<rt>ちょうじょう</rt></ruby>についた", "jp_clean": "険しい道を登ってやっと頂上についた", "cn": "(1) 攀登险峻山路，好不容易到了山顶" }, { "jp_furigana": "<ruby>険<rt>けわ</rt></ruby>しい<ruby>情勢<rt>じょうせい</rt></ruby>", "jp_clean": "険しい情勢", "cn": "(2) 形势险恶" }, { "jp_furigana": "<ruby>前途<rt>ぜんと</rt></ruby>は<ruby>険<rt>けわ</rt></ruby>しいだろうと<ruby>思<rt>おも</rt></ruby>う", "jp_clean": "前途は険しいだろうと思う", "cn": "(2) 我想前途是艰险的" }, { "jp_furigana": "<ruby>険<rt>けわ</rt></ruby>しい<ruby>顔<rt>かお</rt></ruby>", "jp_clean": "険しい顔", "cn": "(3) 严厉的脸色" }, { "jp_furigana": "<ruby>険<rt>けわ</rt></ruby>しい<ruby>目<rt>め</rt></ruby>つきで<ruby>睨<rt>にら</rt></ruby>み<ruby>合<rt>あ</rt></ruby>う", "jp_clean": "険しい目つきで睨み合う", "cn": "(3) 怒目相视" } ] },
+          { "id": 10, "word": "快い", "reading": "こころよい", "meanings": ["高兴；愉快", "清爽；爽快"], "examples": [ { "jp_furigana": "<ruby>快<rt>こころよ</rt></ruby>い<ruby>朝<rt>あさ</rt></ruby>の<ruby>空気<rt>くうき</rt></ruby>", "jp_clean": "快い朝の空気", "cn": "(2) 清爽的晨间空气" }, { "jp_furigana": "<ruby>彼<rt>かれ</rt></ruby>は<ruby>快<rt>こころよ</rt></ruby>く<ruby>引<rt>ひ</rt></ruby>き<ruby>受<rt>う</rt></ruby>けてくれた", "jp_clean": "彼は快く引き受けてくれた", "cn": "(2) 他爽快地答应下来了" }, { "jp_furigana": "<ruby>人<rt>ひと</rt></ruby>の<ruby>忠告<rt>ちゅうこく</rt></ruby>を<ruby>快<rt>こころよ</rt></ruby>く<ruby>入<rt>い</rt></ruby>れる", "jp_clean": "人の忠告を快く入れる", "cn": "(1) 愉快地接受别人的忠告" }, { "jp_furigana": "わたしの<ruby>反対<rt>はんたい</rt></ruby>を<ruby>相手<rt>あいて</rt></ruby>は<ruby>快<rt>こころよ</rt></ruby>く<ruby>思<rt>おも</rt></ruby>わない", "jp_clean": "わたしの反対を相手は快く思わない", "cn": "(1) 我的反对意见使对方很不高兴" } ] },
+          { "id": 11, "word": "図々しい", "reading": "ずうずうしい", "meanings": ["厚颜无耻的"], "examples": [ { "jp_furigana": "<ruby>図々<rt>ずうずう</rt></ruby>しい<ruby>男<rt>おとこ</rt></ruby>", "jp_clean": "図々しい男", "cn": "脸皮厚的男人" }, { "jp_furigana": "<ruby>列<rt>れつ</rt></ruby>に<ruby>割<rt>わ</rt></ruby>り<ruby>込<rt>こ</rt></ruby>んでくるとは<ruby>図々<rt>ずうずう</rt></ruby>しい", "jp_clean": "列に割り込んでくるとは図々しい", "cn": "插队的真是厚颜无耻" } ] },
+          { "id": 12, "word": "騒々しい", "reading": "そうぞうしい", "meanings": ["嘈杂的；吵闹的；喧嚣的", "动乱的；纷扰的；动荡不安的"], "examples": [ { "jp_furigana": "<ruby>騒々<rt>そうぞう</rt></ruby>しい<ruby>会場<rt>かいじょう</rt></ruby>", "jp_clean": "騒々しい会場", "cn": "(1) 嘈杂的会场" }, { "jp_furigana": "<ruby>休<rt>やす</rt></ruby>み<ruby>時間<rt>じかん</rt></ruby>になると、<ruby>急<rt>きゅう</rt></ruby>に<ruby>騒々<rt>そうぞう</rt></ruby>しくなった", "jp_clean": "休み時間になると、急に騒々しくなった", "cn": "(1) 一到休息时间，马上吵闹起来" }, { "jp_furigana": "<ruby>騒々<rt>そうぞう</rt></ruby>しい<ruby>世<rt>よ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>", "jp_clean": "騒々しい世の中", "cn": "(2) 动荡不安的社会" } ] },
+          { "id": 13, "word": "騒がしい", "reading": "さわがしい", "meanings": ["吵闹的；嘈杂的；喧吵的", "议论纷纷的"], "examples": [ { "jp_furigana": "<ruby>騒<rt>さわ</rt></ruby>がしい<ruby>物音<rt>ものおと</rt></ruby>で<ruby>眠<rt>ねむ</rt></ruby>れない", "jp_clean": "騒がしい物音で眠れない", "cn": "(1) 因为吵闹的声音睡不着" }, { "jp_furigana": "<ruby>騒<rt>さわ</rt></ruby>がしく<ruby>喋<rt>しゃべ</rt></ruby>る", "jp_clean": "騒がしく喋る", "cn": "(1) 喧哗地讲话" }, { "jp_furigana": "<ruby>周<rt>まわ</rt></ruby>りが<ruby>騒<rt>さわ</rt></ruby>がしくてよく<ruby>聞<rt>き</rt></ruby>こえない", "jp_clean": "周りが騒がしくてよく聞こえない", "cn": "(1) 周围很吵闹听不大清楚" }, { "jp_furigana": "<ruby>世<rt>よ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>が<ruby>騒<rt>さわ</rt></ruby>がしい", "jp_clean": "世の中が騒がしい", "cn": "(2) 社会上议论纷纷" } ] },
+          { "id": 14, "word": "渋い", "reading": "しぶい", "meanings": ["涩味的", "雅素的；古朴的", "阴沉的；抑郁的", "吝啬的；小气的"], "examples": [ { "jp_furigana": "<ruby>渋<rt>しぶ</rt></ruby>い<ruby>柿<rt>かき</rt></ruby>", "jp_clean": "渋い柿", "cn": "(1) 涩柿子" }, { "jp_furigana": "<ruby>渋<rt>しぶ</rt></ruby>いお<ruby>茶<rt>ちゃ</rt></ruby>が<ruby>飲<rt>の</rt></ruby>みたい", "jp_clean": "渋いお茶が飲みたい", "cn": "(1) 想喝涩一点的茶" }, { "jp_furigana": "<ruby>芸<rt>げい</rt></ruby>が<ruby>渋<rt>しぶ</rt></ruby>い", "jp_clean": "芸が渋い", "cn": "(2) （演员的）演技很老练（细腻）" }, { "jp_furigana": "<ruby>好<rt>この</rt></ruby>みが<ruby>渋<rt>しぶ</rt></ruby>い", "jp_clean": "好みが渋い", "cn": "(2) 趣味很古雅" }, { "jp_furigana": "<ruby>彼<rt>かれ</rt></ruby>は<ruby>渋<rt>しぶ</rt></ruby>い<ruby>文章<rt>ぶんしょう</rt></ruby>を<ruby>書<rt>か</rt></ruby>く", "jp_clean": "彼は渋い文章を書く", "cn": "(2) 他写一手老练晦涩的文章" }, { "jp_furigana": "<ruby>渋<rt>しぶ</rt></ruby>い<ruby>柄<rt>がら</rt></ruby>", "jp_clean": "渋い柄", "cn": "(2) 雅致的花样" }, { "jp_furigana": "<ruby>渋<rt>しぶ</rt></ruby>い<ruby>色<rt>いろ</rt></ruby>", "jp_clean": "渋い色", "cn": "(2) 素雅的颜色" }, { "jp_furigana": "いつも<ruby>渋<rt>しぶ</rt></ruby>い<ruby>顔<rt>かお</rt></ruby>をしている", "jp_clean": "いつも渋い顔をしている", "cn": "(3) 老是绷着面孔" }, { "jp_furigana": "なかなか<ruby>渋<rt>しぶ</rt></ruby>いやつだ", "jp_clean": "なかなか渋いやつだ", "cn": "(4) 是个吝啬鬼" }, { "jp_furigana": "<ruby>払<rt>はら</rt></ruby>いが<ruby>渋<rt>しぶ</rt></ruby>い", "jp_clean": "払いが渋い", "cn": "(4) 付钱不痛快" } ] },
+          { "id": 15, "word": "鋭い", "reading": "するどい", "meanings": ["尖的", "锋利的；快的", "尖锐的", "尖利的；炯炯有神的", "激烈的；强烈的", "敏锐的；机灵的"], "examples": [ { "jp_furigana": "<ruby>先<rt>さき</rt></ruby>を<ruby>鋭<rt>するど</rt></ruby>くする", "jp_clean": "先を鋭くする", "cn": "(1) 把顶端弄尖" }, { "jp_furigana": "<ruby>剃刀<rt>かみそり</rt></ruby>の<ruby>刃<rt>は</rt></ruby>はとても<ruby>鋭<rt>するど</rt></ruby>い", "jp_clean": "剃刀の刃はとても鋭い", "cn": "(2) 剃刀刃特快" }, { "jp_furigana": "<ruby>鋭<rt>するど</rt></ruby>い<ruby>小刀<rt>こがたな</rt></ruby>", "jp_clean": "鋭い小刀", "cn": "(2) 很锋利的小刀" }, { "jp_furigana": "<ruby>鋭<rt>するど</rt></ruby>く<ruby>対立<rt>たいりつ</rt></ruby>する", "jp_clean": "鋭く対立する", "cn": "(3) 针锋相对" }, { "jp_furigana": "<ruby>鋭<rt>するど</rt></ruby>い<ruby>批判<rt>ひはん</rt></ruby>を<ruby>受<rt>う</rt></ruby>ける", "jp_clean": "鋭い批判を受ける", "cn": "(3) 遭到尖锐的批评" }, { "jp_furigana": "<ruby>鋭<rt>するど</rt></ruby>い<ruby>言葉<rt>ことば</rt></ruby>で<ruby>非難<rt>ひなん</rt></ruby>する", "jp_clean": "鋭い言葉で非難する", "cn": "(3) 用尖锐的言词进行责难" }, { "jp_furigana": "<ruby>物<rt>もの</rt></ruby>の<ruby>見方<rt>みかた</rt></ruby>が<ruby>鋭<rt>するど</rt></ruby>い", "jp_clean": "物の見方が鋭い", "cn": "(3) 对事物的看法很尖锐" }, { "jp_furigana": "<ruby>鋭<rt>するど</rt></ruby>い<ruby>目<rt>め</rt></ruby>で<ruby>睨<rt>にら</rt></ruby>む", "jp_clean": "鋭い目で睨む", "cn": "(4) 目光炯炯地盯视" }, { "jp_furigana": "<ruby>鋭<rt>するど</rt></ruby>い<ruby>叫<rt>さけ</rt></ruby>び<ruby>声<rt>ごえ</rt></ruby>", "jp_clean": "鋭い叫び声", "cn": "(4) 尖利的叫声" }, { "jp_furigana": "<ruby>鋭<rt>するど</rt></ruby>い<ruby>攻撃<rt>こうげき</rt></ruby>", "jp_clean": "鋭い攻撃", "cn": "(5) 激烈的攻击" }, { "jp_furigana": "<ruby>頭<rt>あたま</rt></ruby>が<ruby>鋭<rt>するど</rt></ruby>い", "jp_clean": "頭が鋭い", "cn": "(6) 头脑敏锐" } ] },
+          { "id": 16, "word": "逞しい", "reading": "たくましい", "meanings": ["健壮；强壮；魁梧", "旺盛；蓬勃；茁壮", "顽强；坚韧不拔"], "examples": [ { "jp_furigana": "<ruby>逞<rt>たくま</rt></ruby>しい<ruby>若者<rt>わかもの</rt></ruby>", "jp_clean": "逞しい若者", "cn": "(1) 健壮的小伙子" }, { "jp_furigana": "<ruby>逞<rt>たくま</rt></ruby>しい<ruby>力<rt>ちから</rt></ruby>", "jp_clean": "逞しい力", "cn": "(1) 强大的力量" }, { "jp_furigana": "<ruby>逞<rt>たくま</rt></ruby>しい<ruby>向学心<rt>こうがくしん</rt></ruby>", "jp_clean": "逞しい向学心", "cn": "(2) 旺盛的求知欲" }, { "jp_furigana": "<ruby>逞<rt>たくま</rt></ruby>しい<ruby>精神力<rt>せいしんりょく</rt></ruby>", "jp_clean": "逞しい精神力", "cn": "(3) 坚强的精神" } ] },
+          { "id": 17, "word": "乏しい", "reading": "とぼしい", "meanings": ["缺乏；不足；缺少", "贫穷；贫乏；贫困"], "examples": [ { "jp_furigana": "<ruby>経験<rt>けいけん</rt></ruby>が<ruby>乏<rt>とぼ</rt></ruby>しい", "jp_clean": "経験が乏しい", "cn": "(1) 缺乏经验" }, { "jp_furigana": "<ruby>魅力<rt>みりょく</rt></ruby>に<ruby>乏<rt>とぼ</rt></ruby>しい", "jp_clean": "魅力に乏しい", "cn": "(1) 缺乏魅力" }, { "jp_furigana": "その<ruby>時代<rt>じだい</rt></ruby>については<ruby>歴史的<rt>れきしてき</rt></ruby><ruby>記録<rt>きろく</rt></ruby>が<ruby>乏<rt>とぼ</rt></ruby>しい", "jp_clean": "その時代については歴史的記録が乏しい", "cn": "(1) 关于那个时代，历史记载不多" }, { "jp_furigana": "<ruby>乏<rt>とぼ</rt></ruby>しい<ruby>生活<rt>せいかつ</rt></ruby>に<ruby>耐<rt>た</rt></ruby>える", "jp_clean": "乏しい生活に耐える", "cn": "(2) 忍受贫苦的生活" } ] },
+          { "id": 18, "word": "貧しい", "reading": "まずしい", "meanings": ["贫穷；穷苦；贫困；贫寒", "贫乏；微薄"], "examples": [ { "jp_furigana": "<ruby>貧<rt>まず</rt></ruby>しい<ruby>家<rt>いえ</rt></ruby>に<ruby>生<rt>う</rt></ruby>まれる", "jp_clean": "貧しい家に生まれる", "cn": "(1) 生在贫苦人家" }, { "jp_furigana": "<ruby>貧<rt>まず</rt></ruby>しい<ruby>暮<rt>く</rt></ruby>らし", "jp_clean": "貧しい暮らし", "cn": "(1) 穷苦的日子" }, { "jp_furigana": "<ruby>貧<rt>まず</rt></ruby>しい<ruby>人<rt>ひと</rt></ruby>", "jp_clean": "貧しい人", "cn": "(1) 穷人" }, { "jp_furigana": "<ruby>貧<rt>まず</rt></ruby>しい<ruby>国<rt>くに</rt></ruby>", "jp_clean": "貧しい国", "cn": "(1) 贫穷的国家" }, { "jp_furigana": "<ruby>貧<rt>まず</rt></ruby>しい<ruby>才能<rt>さいのう</rt></ruby>", "jp_clean": "貧しい才能", "cn": "(2) 微薄的才能" }, { "jp_furigana": "わたしの<ruby>貧<rt>まず</rt></ruby>しい<ruby>経験<rt>けいけん</rt></ruby>", "jp_clean": "わたしの貧しい経験", "cn": "(2) 我贫乏的经验" }, { "jp_furigana": "<ruby>貧<rt>まず</rt></ruby>しい<ruby>想像力<rt>そうぞうりょく</rt></ruby>", "jp_clean": "貧しい想像力", "cn": "(2) 想象力贫乏" }, { "jp_furigana": "<ruby>君<rt>きみ</rt></ruby>の<ruby>語彙<rt>ごい</rt></ruby>はきわめて<ruby>貧<rt>まず</rt></ruby>しい", "jp_clean": "君の語彙はきわめて貧しい", "cn": "(2) 你的词汇极为贫乏" } ] },
+          { "id": 19, "word": "激しい", "reading": "はげしい", "meanings": ["激烈；强烈；猛烈；剧烈", "好冲动", "很甚；厉害"], "examples": [ { "jp_furigana": "<ruby>風<rt>かぜ</rt></ruby>が<ruby>激<rt>はげ</rt></ruby>しい", "jp_clean": "風が激しい", "cn": "(1) 风疾" }, { "jp_furigana": "<ruby>激<rt>はげ</rt></ruby>しい<ruby>欲望<rt>よくぼう</rt></ruby>", "jp_clean": "激しい欲望", "cn": "(1) 强烈的欲望" }, { "jp_furigana": "<ruby>雨<rt>あめ</rt></ruby><ruby>風<rt>かぜ</rt></ruby>が<ruby>激<rt>はげ</rt></ruby>しい", "jp_clean": "雨風が激しい", "cn": "(1) 暴风骤雨" }, { "jp_furigana": "<ruby>突然<rt>とつぜん</rt></ruby><ruby>激<rt>はげ</rt></ruby>しい<ruby>痛<rt>いた</rt></ruby>みが<ruby>襲<rt>おそ</rt></ruby>った", "jp_clean": "突然激しい痛みが襲った", "cn": "(1) 突然发生剧烈的疼痛" }, { "jp_furigana": "<ruby>激<rt>はげ</rt></ruby>しい<ruby>感情<rt>かんじょう</rt></ruby>をこめて<ruby>言<rt>い</rt></ruby>う", "jp_clean": "激しい感情をこめて言う", "cn": "(1) 感情激动地说" }, { "jp_furigana": "<ruby>議論<rt>ぎろん</rt></ruby>が<ruby>激<rt>はげ</rt></ruby>しくなった", "jp_clean": "議論が激しくなった", "cn": "(1) 争论激烈起来了" }, { "jp_furigana": "<ruby>激<rt>はげ</rt></ruby>しい<ruby>競争<rt>きょうそう</rt></ruby>に<ruby>打<rt>う</rt></ruby>ち<ruby>勝<rt>か</rt></ruby>つ", "jp_clean": "激しい競争に打ち勝つ", "cn": "(1) 在激烈的竞争中获胜" }, { "jp_furigana": "<ruby>彼<rt>かれ</rt></ruby>は<ruby>激<rt>はげ</rt></ruby>しい<ruby>気性<rt>きしょう</rt></ruby>の<ruby>持<rt>も</rt></ruby>ち<ruby>主<rt>ぬし</rt></ruby>だ", "jp_clean": "彼は激しい気性の持ち主だ", "cn": "(2) 他是个容易激动的人" }, { "jp_furigana": "<ruby>激<rt>はげ</rt></ruby>しい<ruby>寒<rt>さむ</rt></ruby>さ", "jp_clean": "激しい寒さ", "cn": "(3) 严寒" }, { "jp_furigana": "<ruby>激<rt>はげ</rt></ruby>しい<ruby>暑<rt>あつ</rt></ruby>さ", "jp_clean": "激しい暑さ", "cn": "(3) 酷暑" } ] },
+          { "id": 20, "word": "等しい", "reading": "ひとしい", "meanings": ["相等；相同；一样；等于"], "examples": [ { "jp_furigana": "<ruby>泥棒<rt>どろぼう</rt></ruby>に<ruby>等<rt>ひと</rt></ruby>しい<ruby>行<rt>おこな</rt></ruby>い", "jp_clean": "泥棒に等しい行い", "cn": "等于偷窃的行为" }, { "jp_furigana": "ほとんどないに<ruby>等<rt>ひと</rt></ruby>しい", "jp_clean": "ほとんどないに等しい", "cn": "几乎等于没有" }, { "jp_furigana": "<ruby>長<rt>なが</rt></ruby>さを<ruby>等<rt>ひと</rt></ruby>しくする", "jp_clean": "長さを等しくする", "cn": "使长度相等" } ] },
+          { "id": 21, "word": "頼もしい", "reading": "たのもしい", "meanings": ["可靠；靠得住", "有出息；有望（将来值得期待）"], "examples": [ { "jp_furigana": "<ruby>彼<rt>かれ</rt></ruby>は<ruby>頼<rt>たの</rt></ruby>もしい<ruby>人<rt>ひと</rt></ruby>だ", "jp_clean": "彼は頼もしい人だ", "cn": "(1) 他是一位靠得住的人" }, { "jp_furigana": "<ruby>頼<rt>たの</rt></ruby>もしい<ruby>音楽家<rt>おんがくか</rt></ruby>", "jp_clean": "頼もしい音楽家", "cn": "(2) 前途有望的音乐家" } ] },
+          { "id": 22, "word": "醜い", "reading": "みにくい", "meanings": ["（外貌）难看；不好看；丑", "（内在）丑陋；丑恶"], "examples": [ { "jp_furigana": "<ruby>彼女<rt>かのじょ</rt></ruby>は<ruby>火傷<rt>やけど</rt></ruby>で<ruby>顔<rt>かお</rt></ruby>が<ruby>醜<rt>みにく</rt></ruby>くなった", "jp_clean": "彼女は火傷で顔が醜くなった", "cn": "(1) 她的脸因为烧伤，变得难看了" }, { "jp_furigana": "<ruby>醜<rt>みにく</rt></ruby>い<ruby>行為<rt>こうい</rt></ruby>", "jp_clean": "醜い行為", "cn": "(2) 丑恶的行为" }, { "jp_furigana": "<ruby>醜<rt>みにく</rt></ruby>い<ruby>親子<rt>おやこ</rt></ruby><ruby>兄弟<rt>きょうだい</rt></ruby>の<ruby>争<rt>あらそ</rt></ruby>い", "jp_clean": "醜い親子兄弟の争い", "cn": "(2) 令人厌恶的骨肉之间的纠纷" } ] },
+          { "id": 23, "word": "憎い", "reading": "にくい", "meanings": ["可憎；可恶；可恨", "令人钦佩；值得佩服（反语用法）"], "examples": [ { "jp_furigana": "<ruby>憎<rt>にく</rt></ruby>いやつ", "jp_clean": "憎いやつ", "cn": "(1) 可恶的家伙" }, { "jp_furigana": "なかなか<ruby>憎<rt>にく</rt></ruby>いことを<ruby>言<rt>い</rt></ruby>うね", "jp_clean": "なかなか憎いことを言うね", "cn": "(2) 你说得真漂亮啊!" }, { "jp_furigana": "なかなか<ruby>憎<rt>にく</rt></ruby>い<ruby>振<rt>ふ</rt></ruby>るまいだ", "jp_clean": "なかなか憎い振るまいだ", "cn": "(2) 令人钦佩的举动" } ] }
+        ];
+
+        let shuffledCards = [];
+        let currentIndex = 0;
+        let synth = window.speechSynthesis;
+
+        const cardEl = document.getElementById('flashcard');
+        const frontWordEl = document.getElementById('front-word');
+        const frontAudioIcon = document.getElementById('front-audio-icon');
+        const showAnswerBtn = document.getElementById('show-answer-btn');
+        
+        const backHeader = document.getElementById('back-header');
+        const backWordEl = backHeader.querySelector('span:first-child');
+        const backReadingEl = backHeader.querySelector('.reading');
+        const wordAudioIcon = backHeader.querySelector('.audio-icon');
+        const meaningsEl = document.getElementById('meanings');
+        const examplesListEl = document.getElementById('examples-list');
+
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const progressBarEl = document.getElementById('progress-bar');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+
+        function speak(text, lang = 'ja-JP') {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            synth.speak(utterance);
+        }
+
+        function shuffleAndStart() {
+            let array = [...flashcardsData];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            shuffledCards = array;
+            currentIndex = 0;
+            displayCard(currentIndex);
+        }
+        
+        function displayCard(index) {
+            cardEl.classList.remove('is-flipped');
+            
+            setTimeout(() => {
+                const cardData = shuffledCards[index];
+                frontWordEl.textContent = cardData.word;
+                frontAudioIcon.onclick = (e) => {
+                    e.stopPropagation();
+                    speak(cardData.reading);
+                };
+                backWordEl.textContent = cardData.word;
+                backReadingEl.textContent = `(${cardData.reading})`;
+                wordAudioIcon.onclick = (e) => {
+                    e.stopPropagation();
+                    speak(cardData.reading);
+                }
+                meaningsEl.innerHTML = '';
+                cardData.meanings.forEach(meaning => {
+                    const div = document.createElement('div');
+                    div.textContent = meaning;
+                    meaningsEl.appendChild(div);
+                });
+                examplesListEl.innerHTML = '';
+                cardData.examples.forEach(ex => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="jp-sentence">
+                            <span>${ex.jp_furigana}</span>
+                            <span class="example-audio-icon audio-icon">🔊</span>
+                        </div>
+                        <div class="cn-translation">${ex.cn}</div>
+                    `;
+                    li.querySelector('.example-audio-icon').onclick = (e) => {
+                        e.stopPropagation();
+                        speak(ex.jp_clean);
+                    };
+                    examplesListEl.appendChild(li);
+                });
+                updateProgressAndButtons();
+            }, 300);
+        }
+        
+        function updateProgressAndButtons() {
+            progressBarEl.textContent = `${currentIndex + 1} / ${shuffledCards.length}`;
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === shuffledCards.length - 1;
+        }
+
+        showAnswerBtn.addEventListener('click', (e) => {
+             e.stopPropagation();
+             cardEl.classList.add('is-flipped');
+        });
+        
+        cardEl.addEventListener('click', (e) => {
+            if (e.target.closest('.card-face')) {
+                 cardEl.classList.toggle('is-flipped');
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < shuffledCards.length - 1) {
+                currentIndex++;
+                displayCard(currentIndex);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                displayCard(currentIndex);
+            }
+        });
+
+        restartBtn.addEventListener('click', shuffleAndStart);
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('night-mode');
+        });
+
+        document.addEventListener('DOMContentLoaded', shuffleAndStart);
+    </script>
+</body>
+</html>
