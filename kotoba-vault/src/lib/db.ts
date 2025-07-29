@@ -58,6 +58,10 @@ export class DeckService {
 		await db.decks.delete(id);
 	}
 
+	static async updateDeckName(id: number, name: string): Promise<number> {
+		return await db.decks.update(id, { name, updatedAt: new Date() });
+	}
+
 	static async exportAllData(): Promise<string> {
 		const decks = await this.getAllDecks();
 		return JSON.stringify(decks, null, 2);

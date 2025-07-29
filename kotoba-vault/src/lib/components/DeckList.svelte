@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import type { DeckData } from '$lib/db.js';
+	import { DeckService } from '$lib/db.js';
 
 	export let decks: DeckData[];
 
@@ -23,21 +24,57 @@
 			dispatch('delete', deckId);
 		}
 	}
+
+	let editingDeckId: number | null = null;
+	let editingDeckName = '';
+
+	function handleEdit(deck: DeckData) {
+		editingDeckId = deck.id!;
+		editingDeckName = deck.name;
+	}
+
+	function handleCancelEdit() {
+		editingDeckId = null;
+		editingDeckName = '';
+	}
+
+	async function handleSaveEdit(id: number) {
+		if (editingDeckName.trim() === '') return;
+		await DeckService.updateDeckName(id, editingDeckName);
+		decks = decks.map((d) => (d.id === id ? { ...d, name: editingDeckName } : d));
+		handleCancelEdit();
+	}
 </script>
 
 <div class="deck-grid">
 	{#each decks as deck (deck.id)}
 		<div class="deck-card">
 			<div class="deck-header">
-				<h3 class="deck-title">{deck.name}</h3>
-				<button 
-					class="delete-btn"
-					on:click={() => handleDelete(deck.id!, deck.name)}
-					title="删除卡片组"
-				>
-					🗑️
-				</button>
-			</div>
+					{#if editingDeckId === deck.id}
+						<input type="text" bind:value={editingDeckName} />
+					{:else}
+						<h3 class="deck-title">{deck.name}</h3>
+					{/if}
+					<button 
+						class="delete-btn"
+						on:click={() => handleDelete(deck.id!, deck.name)}
+						title="删除卡片组"
+					>
+						🗑️
+					</button>
+					{#if editingDeckId === deck.id}
+						<button class="save-btn" on:click={() => handleSaveEdit(deck.id!)}>✔️</button>
+						<button class="cancel-btn" on:click={handleCancelEdit}>❌</button>
+					{:else}
+						<button 
+							class="edit-btn"
+							on:click={() => handleEdit(deck)}
+							title="编辑卡片组"
+						>
+							✏️
+						</button>
+					{/if}
+				</div>
 			
 			<div class="deck-info">
 				<div class="card-count">
@@ -118,6 +155,45 @@
 		opacity: 1;
 		background: #fee;
 		transform: scale(1.1);
+	}
+
+	.edit-btn,
+	.save-btn,
+	.cancel-btn {
+		background: none;
+		border: none;
+		font-size: 1.1em;
+		cursor: pointer;
+		padding: 4px;
+		border-radius: 4px;
+		transition: all 0.2s;
+		opacity: 0.6;
+	}
+
+	.edit-btn:hover {
+		opacity: 1;
+		background: #e0e0e0;
+		transform: scale(1.1);
+	}
+
+	.save-btn:hover {
+		opacity: 1;
+		background: #e0ffe0;
+		transform: scale(1.1);
+	}
+
+	.cancel-btn:hover {
+		opacity: 1;
+		background: #ffe0e0;
+		transform: scale(1.1);
+	}
+
+	input[type="text"] {
+		font-size: 1.2em;
+		padding: 8px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		width: 100%;
 	}
 
 	.deck-info {
