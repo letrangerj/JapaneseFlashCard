@@ -175,6 +175,8 @@
 									</div>
 								{/each}
 							</div>
+						{:else}
+							<p>没有例句数据 - 例句数量: {deckData.cards[currentCardIndex].examples?.length || 0}</p>
 						{/if}
 					</div>
 				{:else}

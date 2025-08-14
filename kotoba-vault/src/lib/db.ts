@@ -24,9 +24,8 @@ export interface CardData {
 }
 
 export interface ExampleData {
-	jp_furigana: string;
-	jp_clean: string;
-	cn: string;
+	japanese: string;
+	chinese: string;
 }
 
 export class KotobaVaultDB extends Dexie {

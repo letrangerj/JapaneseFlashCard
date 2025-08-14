@@ -34,6 +34,8 @@
 		try {
 			error = '';
 			const deckData = await MarkdownParser.parseFile(file);
+			console.log('解析后的卡片组数据:', deckData);
+			console.log('第一张卡片的例句:', deckData.cards[0]?.examples);
 			await DeckService.addDeck(deckData);
 			await loadDecks();
 		} catch (err) {

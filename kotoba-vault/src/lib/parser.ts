@@ -18,6 +18,11 @@ export class MarkdownParser {
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i].trim();
 
+			// 跳过空行
+			if (!line) {
+				continue;
+			}
+
 			// 解析标题
 			if (line.startsWith('# ')) {
 				deck.name = line.substring(2).trim();
@@ -25,9 +30,25 @@ export class MarkdownParser {
 				continue;
 			}
 
+			// 处理分隔符 - 保存当前卡片
+			if (line === '---') {
+				if (currentCard && currentCard.word && currentCard.reading) {
+					deck.cards.push({
+						id: cardId++,
+						word: currentCard.word,
+						reading: currentCard.reading,
+						meanings: currentCard.meanings || [],
+						examples: currentCard.examples || []
+					});
+				}
+				currentCard = null;
+				currentSection = '';
+				continue;
+			}
+
 			// 解析单词卡片开始
 			if (line.startsWith('## ')) {
-				// 保存上一张卡片
+				// 保存上一张卡片（如果有的话）
 				if (currentCard && currentCard.word && currentCard.reading) {
 					deck.cards.push({
 						id: cardId++,
@@ -88,22 +109,23 @@ export class MarkdownParser {
 				const exampleText = line.replace(/^\d+\.\s/, '').trim();
 				const parts = exampleText.split('／');
 				
+				console.log('解析例句:', exampleText, '分割后:', parts);
+				
 				if (parts.length >= 2) {
 					const jpPart = parts[0].trim();
 					const cnPart = parts[1].trim();
 					
-					// 提取纯文本（去除ruby标签）
-					const jpClean = jpPart.replace(/<ruby[^>]*>([^<]*)<rt[^>]*>[^<]*<\/rt><\/ruby>/g, '$1');
-					
 					const example: ExampleData = {
-						jp_furigana: jpPart,
-						jp_clean: jpClean,
-						cn: cnPart
+						japanese: jpPart,
+						chinese: cnPart
 					};
+
+					console.log('创建例句:', example);
 
 					if (currentCard) {
 						currentCard.examples = currentCard.examples || [];
 						currentCard.examples.push(example);
+						console.log('添加到卡片，当前例句数量:', currentCard.examples.length);
 					}
 				}
 				continue;
