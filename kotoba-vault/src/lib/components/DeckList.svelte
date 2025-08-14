@@ -46,35 +46,24 @@
 	}
 </script>
 
+
 <div class="deck-grid">
 	{#each decks as deck (deck.id)}
-		<div class="deck-card">
+		<div class="deck-card md-card">
 			<div class="deck-header">
-					{#if editingDeckId === deck.id}
-						<input type="text" bind:value={editingDeckName} />
-					{:else}
-						<h3 class="deck-title">{deck.name}</h3>
-					{/if}
-					<button 
-						class="delete-btn"
-						on:click={() => handleDelete(deck.id!, deck.name)}
-						title="删除卡片组"
-					>
-						🗑️
-					</button>
-					{#if editingDeckId === deck.id}
-						<button class="save-btn" on:click={() => handleSaveEdit(deck.id!)}>✔️</button>
-						<button class="cancel-btn" on:click={handleCancelEdit}>❌</button>
-					{:else}
-						<button 
-							class="edit-btn"
-							on:click={() => handleEdit(deck)}
-							title="编辑卡片组"
-						>
-							✏️
-						</button>
-					{/if}
-				</div>
+				{#if editingDeckId === deck.id}
+					<input class="md-text-field" type="text" bind:value={editingDeckName} />
+				{:else}
+					<h3 class="deck-title md-title">{deck.name}</h3>
+				{/if}
+				<button class="md-button-base md-icon-button" on:click={() => handleDelete(deck.id!, deck.name)} title="删除卡片组" aria-label="删除卡片组">🗑️</button>
+				{#if editingDeckId === deck.id}
+					<button class="md-button-base md-icon-button" on:click={() => handleSaveEdit(deck.id!)} aria-label="保存名称">✔️</button>
+					<button class="md-button-base md-icon-button" on:click={handleCancelEdit} aria-label="取消编辑">❌</button>
+				{:else}
+					<button class="md-button-base md-icon-button" on:click={() => handleEdit(deck)} title="编辑卡片组" aria-label="编辑卡片组">✏️</button>
+				{/if}
+			</div>
 			
 			<div class="deck-info">
 				<div class="card-count">
@@ -93,7 +82,10 @@
 			</div>
 
 			<div class="deck-actions">
-				<a href="/study/{deck.id}" class="study-btn">
+				<a href="/study/{deck.id}" class="study-button md-button-base">
+					<svg class="button-icon" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M8 5v14l11-7z"/>
+					</svg>
 					开始学习
 				</a>
 			</div>
@@ -104,202 +96,172 @@
 <style>
 	.deck-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: 20px;
-		margin-top: 20px;
+		grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+		gap: var(--md-sys-spacing-6);
+		margin-top: var(--md-sys-spacing-6);
+		width: 100%;
+	}
+
+	/* 确保大屏幕上最多显示3列 */
+	@media (min-width: 1200px) {
+		.deck-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
 	}
 
 	.deck-card {
-		background: white;
-		border-radius: 12px;
-		padding: 24px;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		transition: all 0.3s ease;
-		border: 1px solid #e0e0e0;
+		padding: var(--md-sys-spacing-6);
+		transition: all var(--md-sys-duration-short) var(--md-sys-easing-standard);
+		display: flex;
+		flex-direction: column;
+		min-height: 280px;
 	}
-
+	
 	.deck-card:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+		transform: translateY(-2px);
+		box-shadow: var(--md-sys-elevation-level3);
 	}
 
 	.deck-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
-		margin-bottom: 16px;
+		margin-bottom: var(--md-sys-spacing-4);
+		gap: var(--md-sys-spacing-2);
 	}
 
 	.deck-title {
 		margin: 0;
-		font-size: 1.3em;
+		font-size: 20px;
 		font-weight: 600;
-		color: #2c3e50;
+		color: var(--md-sys-color-on-surface);
 		line-height: 1.4;
 		flex: 1;
-		margin-right: 10px;
-	}
-
-	.delete-btn {
-		background: none;
-		border: none;
-		font-size: 1.1em;
-		cursor: pointer;
-		padding: 4px;
-		border-radius: 4px;
-		transition: all 0.2s;
-		opacity: 0.6;
-	}
-
-	.delete-btn:hover {
-		opacity: 1;
-		background: #fee;
-		transform: scale(1.1);
-	}
-
-	.edit-btn,
-	.save-btn,
-	.cancel-btn {
-		background: none;
-		border: none;
-		font-size: 1.1em;
-		cursor: pointer;
-		padding: 4px;
-		border-radius: 4px;
-		transition: all 0.2s;
-		opacity: 0.6;
-	}
-
-	.edit-btn:hover {
-		opacity: 1;
-		background: #e0e0e0;
-		transform: scale(1.1);
-	}
-
-	.save-btn:hover {
-		opacity: 1;
-		background: #e0ffe0;
-		transform: scale(1.1);
-	}
-
-	.cancel-btn:hover {
-		opacity: 1;
-		background: #ffe0e0;
-		transform: scale(1.1);
 	}
 
 	input[type="text"] {
-		font-size: 1.2em;
-		padding: 8px;
-		border: 1px solid #ccc;
-		border-radius: 4px;
+		font-size: 18px;
+		padding: var(--md-sys-spacing-2) var(--md-sys-spacing-3);
+		border: 1px solid var(--md-sys-color-outline);
+		border-radius: var(--md-sys-shape-corner-small);
+		background: var(--md-sys-color-surface);
+		color: var(--md-sys-color-on-surface);
 		width: 100%;
+		font-family: inherit;
+	}
+
+	input[type="text"]:focus {
+		outline: none;
+		border-color: var(--md-sys-color-primary);
+		box-shadow: 0 0 0 2px color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent);
 	}
 
 	.deck-info {
-		margin-bottom: 16px;
+		margin-bottom: var(--md-sys-spacing-4);
 	}
 
 	.card-count {
 		display: flex;
 		align-items: baseline;
-		gap: 6px;
-		margin-bottom: 8px;
+		gap: var(--md-sys-spacing-2);
+		margin-bottom: var(--md-sys-spacing-2);
 	}
 
 	.count-number {
-		font-size: 2em;
+		font-size: 32px;
 		font-weight: 700;
-		color: #3498db;
+		color: var(--md-sys-color-primary);
 	}
 
 	.count-label {
-		color: #7f8c8d;
-		font-size: 0.9em;
+		color: var(--md-sys-color-on-surface-variant);
+		font-size: 14px;
 	}
 
 	.deck-meta {
-		color: #95a5a6;
-		font-size: 0.85em;
+		color: var(--md-sys-color-on-surface-variant);
+		font-size: 12px;
 	}
 
 	.deck-description {
-		color: #7f8c8d;
-		font-size: 0.9em;
+		color: var(--md-sys-color-on-surface-variant);
+		font-size: 14px;
 		line-height: 1.5;
-		margin-bottom: 20px;
-		min-height: 40px;
+		margin-bottom: var(--md-sys-spacing-5);
+		min-height: 42px;
+		flex: 1;
 	}
 
 	.deck-actions {
 		margin-top: auto;
 	}
 
-	.study-btn {
-		display: inline-block;
-		background: linear-gradient(135deg, #3498db, #2980b9);
-		color: white;
-		text-decoration: none;
-		padding: 12px 24px;
-		border-radius: 8px;
-		font-weight: 500;
-		transition: all 0.2s;
-		text-align: center;
+	.study-button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--md-sys-spacing-2);
 		width: 100%;
-		box-sizing: border-box;
+		height: 48px;
+		padding: 0 var(--md-sys-spacing-4);
+		background: var(--md-sys-color-primary);
+		color: var(--md-sys-color-on-primary);
+		border: none;
+		border-radius: var(--md-sys-shape-corner-medium);
+		text-decoration: none;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all var(--md-sys-duration-short) var(--md-sys-easing-standard);
+		box-shadow: var(--md-sys-elevation-level1);
 	}
 
-	.study-btn:hover {
-		background: linear-gradient(135deg, #2980b9, #2471a3);
+	.study-button:hover {
+		background: var(--md-sys-color-primary);
+		box-shadow: var(--md-sys-elevation-level2);
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
 	}
 
+	.study-button:active {
+		transform: translateY(0);
+		box-shadow: var(--md-sys-elevation-level1);
+	}
+
+	.button-icon {
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+	}
+
+	/* 学习按钮改为 md-filled-button */
+
+	/* 中等屏幕：2列 */
+	@media (max-width: 1200px) {
+		.deck-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	/* 小屏幕：1列 */
 	@media (max-width: 768px) {
 		.deck-grid {
 			grid-template-columns: 1fr;
-			gap: 15px;
+			gap: var(--md-sys-spacing-4);
 		}
 
 		.deck-card {
-			padding: 20px;
+			padding: var(--md-sys-spacing-4);
+			min-height: auto;
 		}
 
 		.deck-title {
-			font-size: 1.2em;
+			font-size: 18px;
 		}
 
 		.count-number {
-			font-size: 1.8em;
+			font-size: 28px;
 		}
 	}
 
-	:global(.dark-mode) .deck-card {
-		background: #2a2a34;
-		border-color: #40404c;
-	}
-
-	:global(.dark-mode) .deck-title {
-		color: #e1e1e1;
-	}
-
-	:global(.dark-mode) .deck-description {
-		color: #8d8d9b;
-	}
-
-	:global(.dark-mode) .deck-meta {
-		color: #6c6c7a;
-	}
-
-	:global(.dark-mode) .count-label {
-		color: #8d8d9b;
-	}
-
-	:global(.dark-mode) .count-number {
-		color: #4aa9f0;
-	}
-
-	:global(.dark-mode) .delete-btn:hover {
-		background: #4a2a2a;
-	}
+	/* 深色模式由 tokens 控制 */
 </style>
