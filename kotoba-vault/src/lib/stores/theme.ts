@@ -16,6 +16,16 @@ function createThemeStore() {
 			}
 			set(theme);
 		},
+		update: (updater: (current: Theme) => Theme) => {
+			update((current) => {
+				const newTheme = updater(current);
+				if (browser) {
+					localStorage.setItem('theme', newTheme);
+					applyTheme(newTheme);
+				}
+				return newTheme;
+			});
+		},
 		init: () => {
 			if (browser) {
 				const stored = localStorage.getItem('theme') as Theme | null;
@@ -50,8 +60,12 @@ export const themeStore = createThemeStore();
 if (browser) {
 	themeStore.init();
 	
-	// Listen for system theme changes
+	// Listen for system theme changes when theme is set to 'auto'
 	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-		themeStore.set('auto'); // This will reapply the auto theme
+		// Only reapply if current theme is 'auto'
+		const stored = localStorage.getItem('theme') as Theme | null;
+		if ((stored || 'auto') === 'auto') {
+			applyTheme('auto');
+		}
 	});
 }
