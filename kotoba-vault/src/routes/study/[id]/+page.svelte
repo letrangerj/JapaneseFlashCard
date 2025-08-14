@@ -66,6 +66,21 @@
 	function toggleAnswer() {
 		showAnswer = !showAnswer;
 	}
+
+	// 打乱卡片顺序
+	function shuffleCards() {
+		if (deckData && deckData.cards.length > 0) {
+			// Fisher-Yates 洗牌算法
+			const cards = [...deckData.cards];
+			for (let i = cards.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[cards[i], cards[j]] = [cards[j], cards[i]];
+			}
+			deckData.cards = cards;
+			currentCardIndex = 0; // 重置到第一张卡片
+			showAnswer = false; // 隐藏答案
+		}
+	}
 </script>
 
 <svelte:head>
@@ -84,8 +99,16 @@
 		<div class="study-header">
 			<h1>{deckData.name}</h1>
 			<p>{deckData.description}</p>
-			<div class="progress">
-				卡片进度: {currentCardIndex + 1} / {deckData.cards.length}
+			<div class="header-controls">
+				<div class="progress">
+					卡片进度: {currentCardIndex + 1} / {deckData.cards.length}
+				</div>
+				<button class="shuffle-btn" on:click={shuffleCards} title="打乱卡片顺序">
+					<svg class="shuffle-icon" viewBox="0 0 24 24" fill="currentColor">
+						<path d="M10.59,9.17L5.41,4L4,5.41L9.17,10.58L10.59,9.17M14.5,4L16.54,6.04L4,18.59L5.41,20L17.96,7.46L20,9.5V4M14.83,13.41L20,18.59L18.59,20L13.41,14.83L14.83,13.41Z"/>
+					</svg>
+					<span class="shuffle-text">打乱</span>
+				</button>
 			</div>
 		</div>
 
@@ -193,6 +216,14 @@
 		margin-bottom: var(--md-sys-spacing-5);
 	}
 
+	.header-controls {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--md-sys-spacing-4);
+		flex-wrap: wrap;
+	}
+
 	.progress {
 		background: var(--md-sys-color-primary-container);
 		color: var(--md-sys-color-on-primary-container);
@@ -209,6 +240,49 @@
 		border: none;
 		cursor: default;
 		transition: all var(--md-sys-duration-short) var(--md-sys-easing-standard);
+	}
+
+	.shuffle-btn {
+		background: var(--md-sys-color-secondary-container);
+		color: var(--md-sys-color-on-secondary-container);
+		padding: var(--md-sys-spacing-3);
+		border: none;
+		border-radius: var(--md-sys-shape-corner-extra-large);
+		font-weight: 500;
+		font-size: 14px;
+		line-height: 1.4;
+		min-height: 48px;
+		cursor: pointer;
+		transition: all var(--md-sys-duration-short) var(--md-sys-easing-standard);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--md-sys-spacing-2);
+		box-shadow: none;
+		font-family: inherit;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.shuffle-btn:hover {
+		background: var(--md-sys-color-secondary);
+		color: var(--md-sys-color-on-secondary);
+		transform: none;
+	}
+
+	.shuffle-btn:active {
+		transform: scale(0.95);
+	}
+
+	.shuffle-icon {
+		width: 18px;
+		height: 18px;
+		flex-shrink: 0;
+	}
+
+	.shuffle-text {
+		font-size: 14px;
+		font-weight: 500;
 	}
 
 	.flashcard {
@@ -488,6 +562,26 @@
 	@media (max-width: 600px) {
 		.study-container {
 			padding: var(--md-sys-spacing-4);
+		}
+
+		.header-controls {
+			flex-direction: column;
+			gap: var(--md-sys-spacing-3);
+		}
+
+		.shuffle-btn {
+			padding: var(--md-sys-spacing-2) var(--md-sys-spacing-4);
+			min-height: 40px;
+			font-size: 12px;
+		}
+
+		.shuffle-icon {
+			width: 16px;
+			height: 16px;
+		}
+
+		.shuffle-text {
+			font-size: 12px;
 		}
 
 		.card-navigation {
